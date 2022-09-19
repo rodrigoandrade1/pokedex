@@ -6,7 +6,6 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: resolve(__dirname),
   base: '/pokedex/',
   build: {
     outDir: "docs",
