@@ -1,97 +1,117 @@
 <script setup>
 import axios from "axios";
-import { ref } from 'vue';
+import { ref } from "vue";
 
 let fetchUrl = "https://pokeapi.co/api/v2/pokemon";
 let loading = ref(true);
 let filtered = false;
 let pokemonList = ref([]);
 let backupList = [];
+let modalPoke = ref({});
 
 const pokemonTypes = [
-  'bug', 'dark', 'dragon', 'electric', 'fairy', 'fighting', 'fire',
-  'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison',
-  'psychic', 'rock', 'steel', 'water'
-]
+  "bug",
+  "dark",
+  "dragon",
+  "electric",
+  "fairy",
+  "fighting",
+  "fire",
+  "flying",
+  "ghost",
+  "grass",
+  "ground",
+  "ice",
+  "normal",
+  "poison",
+  "psychic",
+  "rock",
+  "steel",
+  "water",
+];
 
 async function fetchData(qtd) {
-  console.log(qtd)
-  await axios
-    .get(fetchUrl, {
-      params: {
-        limit: qtd
-      }
-    })
-    .then((response) => {
-      fetchUrl = response.data.next;
-      Object.keys(response.data.results).forEach( async (item) => {
-        await fetchPokemon(response.data.results[item].url)
+  if (filtered) {
+    filterByType("");
+    fetchData(27);
+  } else {
+    await axios
+      .get(fetchUrl, {
+        params: {
+          limit: qtd,
+        },
       })
-      console.log(fetchUrl)
-      
+      .then((response) => {
+        fetchUrl = response.data.next;
+        Object.keys(response.data.results).forEach(async (item) => {
+          await fetchPokemon(response.data.results[item].url);
+        });
+        console.log(fetchUrl);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .then(() => {
+        setTimeout(() => {
+          const newList = pokemonList.value.sort((a, b) => a.id - b.id);
+          pokemonList.value = newList;
+          loading.value = false;
+        }, 100);
+      });
+  }
+}
+
+async function fetchPokemon(url) {
+  await axios
+    .get(url)
+    .then((response) => {
+      pokemonList.value.push(response.data);
     })
     .catch((error) => {
       console.log(error);
     })
     .then(() => {
-      setTimeout(() => {
-        const newList = pokemonList.value.sort((a, b) => a.id - b.id)
-        pokemonList.value = newList
-        loading.value = false;
-      }, 100);
+      loading.value = false;
     });
 }
 
-async function fetchPokemon(url) {
-  await axios
-  .get(url)
-  .then((response) => {
-    pokemonList.value.push(response.data)
-  })
-  .catch((error) => {
-    console.log(error)
-  })
-  .then(() => {
-    loading.value = false;
-  })
-}
-
 function filterByType(type) {
-  if (filtered){
-    pokemonList.value = backupList
-    backupList = []
-    filtered = false
+  if (filtered) {
+    pokemonList.value = backupList;
+    backupList = [];
+    filtered = false;
   } else {
-   const filteredList = pokemonList.value.filter((el) => {
-    return el.types[0].type.name == type
-    })
+    const filteredList = pokemonList.value.filter((el) => {
+      return (
+        el.types[0].type.name == type ||
+        (el.types[1] ? el.types[1].type.name == type : "")
+      );
+    });
 
-    backupList = pokemonList.value
-    pokemonList.value = filteredList
-    filtered = true
-    // console.log(filteredList) 
+    backupList = pokemonList.value;
+    pokemonList.value = filteredList;
+    filtered = true;
+    // console.log(filteredList)
   }
-  
 }
 
-function formatedID(id){
-  if (id.toString().length == 1){
-    return `00${id}`
+function formatedID(id) {
+  if (id.toString().length == 1) {
+    return `00${id}`;
   } else if (id.toString().length == 2) {
-    return `0${id}`
+    return `0${id}`;
   } else {
-    return id
+    return id;
   }
 }
 
-fetchData(27)
-
+fetchData(27);
 </script>
 
 <template>
   <div>
     <header>
-      <img class="ms-4 mt-4" src="@/assets/logo.svg" alt="">
+      <img class="ms-4 mt-4" src="@/assets/logo.svg" alt="" />
     </header>
 
     <div class="container">
@@ -99,29 +119,34 @@ fetchData(27)
         <div class="col-12 col-xl-4">
           <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">
-              <img src="@/assets/icon.png" alt="" style="width: 24px">
+              <img src="@/assets/icon.png" alt="" style="width: 24px" />
             </span>
             <input
-            type="text"
-            id="search"
-            class="form-control"
-            placeholder="Procurar por nome ou ID.."
-          />
+              type="text"
+              id="search"
+              class="form-control"
+              placeholder="Procurar por nome ou ID.."
+            />
           </div>
         </div>
         <div class="col-12">
-          <ul class="d-flex justify-content-around p-0 flex-wrap" style="color: rgba(177, 177, 177, .7);">
-            <li class="filter-item" @click="filterByType(type)" v-for="(type, idx) in pokemonTypes" :key="idx">
-              <img :src="`src/assets/types/${type}.svg`" alt="">
+          <ul
+            class="d-flex justify-content-around p-0 flex-wrap"
+            style="color: rgba(177, 177, 177, 0.7)"
+          >
+            <li
+              class="filter-item"
+              @click="filterByType(type)"
+              v-for="(type, idx) in pokemonTypes"
+              :key="idx"
+            >
+              <img :src="`src/assets/types/${type}.svg`" alt="" />
               <span class="filterActive text-capitalize">{{ type }}</span>
             </li>
           </ul>
         </div>
       </div>
-      <div
-        class="loading w-100 d-flex justify-content-center"
-        v-if="loading"
-      >
+      <div class="loading w-100 d-flex justify-content-center" v-if="loading">
         <img
           id="loader"
           src="@/assets/loader.svg"
@@ -132,34 +157,59 @@ fetchData(27)
       <div class="row gx-5 gy-4" v-if="!loading">
         <div class="col-12 col-xl-4" v-for="p in pokemonList" :key="p.id">
           <Transition name="slide-fade" appear>
-            <div :class="'poke-card ' + p.types[0].type.name">
+            <div
+              role="button"
+              :class="'poke-card ' + p.types[0].type.name"
+              @click="modalPoke = p"
+              data-bs-toggle="modal"
+              data-bs-target="#pokemonInfoModal"
+            >
               <div
                 class="poke-photo d-flex justify-content-center align-items-center me-5"
               >
-                <img :src="p.sprites.other.dream_world.front_default" class="w-100 h-100" alt="" />
+                <img
+                  :src="p.sprites.other.dream_world.front_default"
+                  class="w-100 h-100"
+                  alt=""
+                />
               </div>
-              <div
-                class="poke-info d-flex flex-column justify-content-around"
-              >
+              <div class="poke-info d-flex flex-column justify-content-around">
                 <div class="poke-name">
                   <div class="poke-id">
                     <span>#{{ formatedID(p.id) }}</span>
                   </div>
-                  <span class="text-capitalize">{{p.name}}</span>
+                  <span class="text-capitalize">{{ p.name }}</span>
                 </div>
                 <div class="poke-elements">
-                  <img :src="`./src/assets/types/${p.types[0].type.name}.svg`" alt="" />
+                  <img
+                    class="me-2"
+                    :src="`./src/assets/types/${p.types[0].type.name}.svg`"
+                    alt=""
+                  />
+                  <img
+                    v-if="p.types[1]"
+                    :src="`./src/assets/types/${p.types[1].type.name}.svg`"
+                    alt=""
+                  />
+                  <img
+                    v-if="p.types[2]"
+                    :src="`./src/assets/types/${p.types[2].type.name}.svg`"
+                    alt=""
+                  />
                 </div>
-                
               </div>
             </div>
           </Transition>
         </div>
         <div class="col-10">
-          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(1)">Carregar mais..</button>
+          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(1)">
+            Carregar mais..
+          </button>
         </div>
         <div class="col-2">
-          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(100)">Carregar todos</button>
+          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(100)">
+            Carregar todos
+          </button>
         </div>
       </div>
     </div>
@@ -167,11 +217,97 @@ fetchData(27)
     <footer>
       <div class="container">
         <div class="d-flex align-items-center justify-content-between">
-          <div><img style="width: 200px" src="@/assets/logo.svg" alt=""></div>
-          <div>linkedin.com/in/rodrigoandradee1</div> 
+          <div><img style="width: 200px" src="@/assets/logo.svg" alt="" /></div>
+          <div>linkedin.com/in/rodrigoandradee1</div>
         </div>
       </div>
     </footer>
+
+    <div v-if="!Object.keys(modalPoke).length == 0">
+      <div
+        class="modal fade"
+        id="pokemonInfoModal"
+        tabindex="-1"
+        aria-labelledby="pokemonInfoModal"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div
+              class="modal-body bg-dark text-white rounded-5"
+              style="min-height: 300px"
+            >
+              <div class="row">
+                <div class="col-4">
+                  <div class="modal-photo">
+                    <img
+                      :src="modalPoke.sprites.other.dream_world.front_default"
+                      class="w-100"
+                      alt=""
+                    />
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center">
+                          <span class="text-capitalize fs-4">{{
+                            modalPoke.name
+                          }}</span>
+                          <span class="ms-2 mt-2" style="color: gray"
+                            >#{{ formatedID(modalPoke.id) }}</span
+                          >
+                        </div>
+                        <div
+                          class="rounded"
+                          style="
+                            width: 24px;
+                            height: 24px;
+                            background-color: gray;
+                          "
+                        >
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="element-box-fire">
+                        <img
+                          class="mb-1"
+                          :src="`./src/assets/types/${modalPoke.types[0].type.name}.svg`"
+                          alt=""
+                        />
+                        <span class="text-uppercase ms-2">{{
+                          modalPoke.types[0].type.name
+                        }}</span>
+                      </div>
+                      <div v-if="modalPoke.types[1]" class="element-box-fire">
+                        <img
+                          class="mb-1"
+                          :src="`./src/assets/types/${modalPoke.types[1].type.name}.svg`"
+                          alt=""
+                        />
+                        <span
+                          class="text-uppercase ms-2"
+                          v-if="modalPoke.types[1]"
+                          >{{ modalPoke.types[1].type.name }}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -179,23 +315,23 @@ fetchData(27)
 header {
   height: 60vh;
   width: 100vw;
-  background-image: url('@/assets/bg.png');
+  background-image: url("@/assets/bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   box-shadow: inset 0px -24px 20px -6px #181818;
 }
 
-ul{
+ul {
   list-style: none;
 }
 
-ul>li{
+ul > li {
   display: flex;
   flex-direction: column;
 }
 
-ul>li>img{
+ul > li > img {
   height: 23px;
 }
 
@@ -243,12 +379,37 @@ ul>li>img{
   color: white;
 }
 
-.poke-id span{
+.poke-id span {
   font-size: 14px;
   color: rgba(247, 247, 247, 0.582);
 }
 
-footer{
+.modal-photo {
+  /* background-color: rgba(240, 248, 255, 0.068); */
+  height: 100%;
+  width: 100%;
+  border-radius: 25%;
+  /* border: 1px solid rgba(128, 128, 128, 0.315); */
+}
+
+.modal-photo img {
+  position: relative;
+  left: -100%;
+  width: 200% !important;
+}
+
+.element-box-fire {
+  background-color: rgba(230, 230, 230, 0.459);
+  color: rgb(214, 211, 211);
+  border-radius: 10px;
+  padding: 3px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+footer {
   margin-top: 20px;
   height: 14vh;
   color: white;
@@ -258,13 +419,18 @@ footer{
   align-items: center;
 }
 
-.filter-item{
-  transition: .2s;
+.filter-item {
+  transition: 0.2s;
   cursor: pointer;
 }
 
-.filter-item:hover{
+.filter-item:hover {
   transform: scale(1.2);
+}
+
+.modal-content {
+  background-color: transparent !important;
+  border: none !important;
 }
 
 .slide-fade-enter-active {
@@ -281,76 +447,75 @@ footer{
   opacity: 0;
 }
 
-.poke-card.bug .poke-photo::before{
+.poke-card.bug .poke-photo::before {
   background-color: rgb(164, 224, 24);
 }
 
-.poke-card.dark .poke-photo::before{
+.poke-card.dark .poke-photo::before {
   background-color: rgb(48, 26, 88);
 }
 
-.poke-card.dragon .poke-photo::before{
+.poke-card.dragon .poke-photo::before {
   background-color: rgb(25, 159, 192);
 }
 
-.poke-card.electric .poke-photo::before{
+.poke-card.electric .poke-photo::before {
   background-color: rgb(217, 255, 0);
 }
 
-.poke-card.fairy .poke-photo::before{
+.poke-card.fairy .poke-photo::before {
   background-color: rgb(224, 24, 117);
 }
 
-.poke-card.fighting .poke-photo::before{
+.poke-card.fighting .poke-photo::before {
   background-color: rgb(224, 224, 224);
 }
 
-.poke-card.fire .poke-photo::before{
+.poke-card.fire .poke-photo::before {
   background-color: rgb(224, 104, 24);
 }
 
-.poke-card.flying .poke-photo::before{
+.poke-card.flying .poke-photo::before {
   background-color: rgb(44, 161, 228);
 }
 
-.poke-card.ghost .poke-photo::before{
+.poke-card.ghost .poke-photo::before {
   background-color: rgb(171, 64, 197);
 }
 
-.poke-card.grass .poke-photo::before{
+.poke-card.grass .poke-photo::before {
   background-color: rgb(105, 196, 93);
 }
 
-.poke-card.ground .poke-photo::before{
+.poke-card.ground .poke-photo::before {
   background-color: rgb(139, 92, 61);
 }
 
-.poke-card.ice .poke-photo::before{
+.poke-card.ice .poke-photo::before {
   background-color: rgb(24, 201, 224);
 }
 
-.poke-card.normal .poke-photo::before{
+.poke-card.normal .poke-photo::before {
   background-color: rgb(224, 224, 224);
 }
 
-.poke-card.poison .poke-photo::before{
+.poke-card.poison .poke-photo::before {
   background-color: rgb(131, 19, 223);
 }
 
-.poke-card.psychic .poke-photo::before{
+.poke-card.psychic .poke-photo::before {
   background-color: rgb(247, 0, 255);
 }
 
-.poke-card.rock .poke-photo::before{
+.poke-card.rock .poke-photo::before {
   background-color: rgb(99, 65, 34);
 }
 
-.poke-card.steel .poke-photo::before{
+.poke-card.steel .poke-photo::before {
   background-color: rgb(77, 104, 83);
 }
 
-.poke-card.water .poke-photo::before{
+.poke-card.water .poke-photo::before {
   background-color: rgb(24, 134, 224);
 }
-
 </style>
