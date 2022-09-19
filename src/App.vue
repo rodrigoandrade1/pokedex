@@ -8,6 +8,8 @@ import HomeView from "./views/HomeView.vue";
 
 <style>
 body {
-  background-color: #FEFEFE
+  /* background-color: #FEFEFE */
+  background-color: #181818;
+  overflow-x: hidden;
 }
 </style>
