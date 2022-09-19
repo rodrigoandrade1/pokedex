@@ -201,12 +201,12 @@ fetchData(27);
             </div>
           </Transition>
         </div>
-        <div class="col-10">
+        <div class="col-12 col-lg-10">
           <button class="btn btn-secondary mt-4 w-100" @click="fetchData(1)">
             Carregar mais..
           </button>
         </div>
-        <div class="col-2">
+        <div class="col-12 col-lg-2">
           <button class="btn btn-secondary mt-4 w-100" @click="fetchData(100)">
             Carregar todos
           </button>
@@ -216,9 +216,19 @@ fetchData(27);
 
     <footer>
       <div class="container">
-        <div class="d-flex align-items-center justify-content-between">
-          <div><img style="width: 200px" src="@/assets/logo.svg" alt="" /></div>
-          <div>linkedin.com/in/rodrigoandradee1</div>
+        <div class="row">
+          <div class="d-none d-lg-block col-12">
+            <div class="d-flex align-items-center justify-content-between">
+              <div><img style="max-width: 200px" src="@/assets/logo.svg" alt="" /></div>
+              <div>linkedin.com/in/rodrigoandradee1</div>
+            </div>
+          </div>
+          <div class="d-lg-none col-12">
+            <div class="d-flex flex-column align-items-center justify-content-between">
+              <div><img style="max-width: 200px" src="@/assets/logo.svg" alt="" /></div>
+              <div>linkedin.com/in/rodrigoandradee1</div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
@@ -231,7 +241,7 @@ fetchData(27);
         aria-labelledby="pokemonInfoModal"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content">
             <div
               class="modal-body bg-dark text-white rounded-5"
@@ -393,9 +403,6 @@ ul > li > img {
 }
 
 .modal-photo img {
-  position: relative;
-  left: -100%;
-  width: 200% !important;
 }
 
 .element-box-fire {

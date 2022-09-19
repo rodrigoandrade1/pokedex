@@ -6,9 +6,10 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: path.resolve(__dirname),
+  // root: path.resolve(__dirname),
+  base: '/<REPO>/',
   build: {
-    outDir: path.resolve(__dirname, 'docs'),
+    outDir: "docs",
   },
   plugins: [vue()],
   resolve: {
