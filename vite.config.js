@@ -1,13 +1,13 @@
 import { fileURLToPath, URL } from "node:url";
-import path from 'path'
+import resolve from 'path'
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // root: path.resolve(__dirname),
-  base: '/<REPO>/',
+  root: resolve(__dirname),
+  base: '',
   build: {
     outDir: "docs",
   },
