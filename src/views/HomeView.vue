@@ -104,6 +104,10 @@ function formatedID(id) {
   }
 }
 
+function imgUrl(type) {
+  return new URL(`/src/assets/types/${type}.svg`, import.meta.url).href;
+}
+
 fetchData(27);
 setTimeout(() => {
   modalPoke.value = pokemonList.value[0]
@@ -143,7 +147,7 @@ setTimeout(() => {
               v-for="(type, idx) in pokemonTypes"
               :key="idx"
             >
-              <img :src="`/assets/types/${type}.svg`" alt="" />
+              <img :src="imgUrl(type)" alt="" />
               <span class="filterActive text-capitalize">{{ type }}</span>
             </li>
           </ul>
