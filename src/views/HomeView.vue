@@ -46,7 +46,6 @@ async function fetchData(qtd) {
         Object.keys(response.data.results).forEach(async (item) => {
           await fetchPokemon(response.data.results[item].url);
         });
-        console.log(fetchUrl);
       })
       .catch((error) => {
         console.log(error);
@@ -106,6 +105,10 @@ function formatedID(id) {
 }
 
 fetchData(27);
+setTimeout(() => {
+  modalPoke.value = pokemonList.value[0]
+}, 500);
+
 </script>
 
 <template>
@@ -140,7 +143,7 @@ fetchData(27);
               v-for="(type, idx) in pokemonTypes"
               :key="idx"
             >
-              <img :src="`src/assets/types/${type}.svg`" alt="" />
+              <img :src="`/assets/types/${type}.svg`" alt="" />
               <span class="filterActive text-capitalize">{{ type }}</span>
             </li>
           </ul>
@@ -168,7 +171,14 @@ fetchData(27);
                 class="poke-photo d-flex justify-content-center align-items-center me-5"
               >
                 <img
+                  v-if="p.id < 650"
                   :src="p.sprites.other.dream_world.front_default"
+                  class="w-100 h-100"
+                  alt=""
+                />
+                <img
+                  v-if="p.id > 650"
+                  :src="p.sprites.other.official-artwork.front_default"
                   class="w-100 h-100"
                   alt=""
                 />
@@ -186,7 +196,7 @@ fetchData(27);
                     :src="`./src/assets/types/${p.types[0].type.name}.svg`"
                     alt=""
                   />
-                  <img
+                  <!-- <img
                     v-if="p.types[1]"
                     :src="`./src/assets/types/${p.types[1].type.name}.svg`"
                     alt=""
@@ -195,20 +205,15 @@ fetchData(27);
                     v-if="p.types[2]"
                     :src="`./src/assets/types/${p.types[2].type.name}.svg`"
                     alt=""
-                  />
+                  /> -->
                 </div>
               </div>
             </div>
           </Transition>
         </div>
-        <div class="col-12 col-lg-10">
-          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(1)">
+        <div class="col-12 col-lg-12">
+          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(27)">
             Carregar mais..
-          </button>
-        </div>
-        <div class="col-12 col-lg-2">
-          <button class="btn btn-secondary mt-4 w-100" @click="fetchData(100)">
-            Carregar todos
           </button>
         </div>
       </div>
