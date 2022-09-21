@@ -294,7 +294,7 @@ setTimeout(() => {
                       <div class="element-box-fire">
                         <img
                           class="mb-1"
-                          :src="`./src/assets/types/${modalPoke.types[0].type.name}.svg`"
+                          :src="imgUrl(modalPoke.types[0].type.name)"
                           alt=""
                         />
                         <span class="text-uppercase ms-2">{{
@@ -304,7 +304,7 @@ setTimeout(() => {
                       <div v-if="modalPoke.types[1]" class="element-box-fire">
                         <img
                           class="mb-1"
-                          :src="`./src/assets/types/${modalPoke.types[1].type.name}.svg`"
+                          :src="imgUrl(modalPoke.types[1].type.name)"
                           alt=""
                         />
                         <span
