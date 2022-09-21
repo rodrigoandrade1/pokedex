@@ -197,19 +197,14 @@ setTimeout(() => {
                 <div class="poke-elements">
                   <img
                     class="me-2"
-                    :src="`./src/assets/types/${p.types[0].type.name}.svg`"
-                    alt=""
-                  />
-                  <!-- <img
-                    v-if="p.types[1]"
-                    :src="`./src/assets/types/${p.types[1].type.name}.svg`"
+                    :src="imgUrl(p.types[0].type.name)"
                     alt=""
                   />
                   <img
-                    v-if="p.types[2]"
-                    :src="`./src/assets/types/${p.types[2].type.name}.svg`"
+                    v-if="p.types[1]"
+                    :src="imgUrl(p.types[1].type.name)"
                     alt=""
-                  /> -->
+                  />
                 </div>
               </div>
             </div>
